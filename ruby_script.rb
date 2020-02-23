@@ -1,3 +1,4 @@
-require './string_handler.rb'
+require './csv_parser.rb'
+require './data_handler.rb'
 
-StringHandler.new.read_csv
+Shower.new.show

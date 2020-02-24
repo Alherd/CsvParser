@@ -1,3 +1,3 @@
-require './data_handler.rb'
+require './csv_parsing/display.rb'
 
-Shower.new.show
+Display.new.show

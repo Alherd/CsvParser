@@ -33,21 +33,21 @@ class LengthDeterminant < CsvParser
     (0..index_types.length - 1).each do |i|
       hash_max_length.merge!(i => 0)
     end
-    iterate_csv_data(hash_max_length, index_types)
+    iterate_csv_array(hash_max_length, index_types)
   end
 
-  def iterate_csv_data(hash_max_length, index_types)
+  def iterate_csv_array(hash_max_length, index_types)
     data_csv_without_types_columns = data_from_csv.drop(1)
-    data_csv_without_types_columns.each do |i|
-      current_row_array = i[0].split(';')
-      (0..current_row_array.length - 1).each do |j|
-        define_max_string_word(hash_max_length, current_row_array, index_types, j)
+    data_csv_without_types_columns.each do |row|
+      current_row_array = row[0].split(';')
+      (0..current_row_array.length - 1).each do |index_value|
+        define_max_length_value(hash_max_length, current_row_array, index_types, index_value)
       end
     end
     hash_max_length
   end
 
-  def define_max_string_word(hash_max_length, current_row_array, index_types, index)
+  def define_max_length_value(hash_max_length, current_row_array, index_types, index)
     if index_types[index] == STRING_COLUMN
       string_list = current_row_array[index].split(' ')
       string_list.each do |word|

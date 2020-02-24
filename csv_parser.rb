@@ -27,22 +27,29 @@ class LengthDeterminant < CsvParser
     (0..index_types.length - 1).each do |i|
       hash_max_length.merge!(i => 0)
     end
+    iterate_csv_data(hash_max_length, index_types)
+  end
 
+  def iterate_csv_data(hash_max_length, index_types)
     data_csv_without_types_columns = data_from_csv.drop(1)
     data_csv_without_types_columns.each do |i|
       current_row_array = i[0].split(';')
       (0..current_row_array.length - 1).each do |j|
-        if index_types[j] == 'string'
-          string_list = current_row_array[j].split(' ')
-          string_list.each do |word|
-            hash_max_length[j] = word.length if hash_max_length[j] < word.length
-          end
-        elsif hash_max_length[j] < current_row_array[j].length
-          hash_max_length[j] = current_row_array[j].length
-        end
+        define_max_string_word(hash_max_length, current_row_array, index_types, j)
       end
     end
     hash_max_length
+  end
+
+  def define_max_string_word(hash_max_length, current_row_array, index_types, index)
+    if index_types[index] == 'string'
+      string_list = current_row_array[index].split(' ')
+      string_list.each do |word|
+        hash_max_length[index] = word.length if hash_max_length[index] < word.length
+      end
+    elsif hash_max_length[index] < current_row_array[index].length
+      hash_max_length[index] = current_row_array[index].length
+    end
   end
 end
 

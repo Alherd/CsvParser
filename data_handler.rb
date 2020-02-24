@@ -8,19 +8,18 @@ class DataHandler < LinesBuilder
   STRING_COLUMN = 'string'
   MONEY_COLUMN = 'money'
 
-  def change_format(index, value)
+  def change_format(index, value) # rubocop:disable Metrics/MethodLength
     index_types = create_hash_index_types
     case index_types[index]
-    when 'int'
-      show_string = IntDataHandler.new.add_space(index, value)
-    when 'string'
-      show_string = StringDataHandler.new.add_space(index, value)
-    when 'money'
-      show_string = MoneyDataHandler.new.add_space(index, value)
+    when INT_COLUMN
+      IntDataHandler.new.add_space(index, value)
+    when STRING_COLUMN
+      StringDataHandler.new.add_space(index, value)
+    when MONEY_COLUMN
+      MoneyDataHandler.new.add_space(index, value)
     else
-      show_string = ''
+      ''
     end
-    show_string
   end
 end
 

@@ -1,5 +1,8 @@
+# frozen_string_literal: true
+
 require './csv_parser.rb'
 
+# Base Data class to delegate adding space realization
 class DataHandler < LinesBuilder
   INT_COLUMN = 'int'
   STRING_COLUMN = 'string'
@@ -19,16 +22,12 @@ class DataHandler < LinesBuilder
     end
     show_string
   end
-
-  def get_puts_string
-
-  end
 end
 
 class IntDataHandler < DataHandler
   def add_space(index, value)
     int_max_length = define_max_length[index]
-    space = ''
+    space = ''.dup
     (value.length..int_max_length - 1).each do
       space.concat(' ')
     end
@@ -39,7 +38,7 @@ end
 class StringDataHandler < DataHandler
   def add_space(index, value)
     int_max_length = define_max_length[index]
-    space = ''
+    space = ''.dup
     (value.length..int_max_length - 1).each do
       space.concat(' ')
     end
@@ -50,7 +49,7 @@ end
 class MoneyDataHandler < DataHandler
   def add_space(index, value)
     int_max_length = define_max_length[index]
-    space = ''
+    space = ''.dup
     (value.length..int_max_length - 1).each do
       space.concat(' ')
     end
@@ -69,7 +68,7 @@ class Shower < DataHandler
     puts get_first_line
     data_csv_without_types_columns.each do |row|
       current_row_array = row[0].split(';')
-      string_puts = "|"
+      string_puts = '|'.dup
       (0..current_row_array.length - 1).each do |i|
         if index_string_type != -1
           if i == index_string_type
@@ -87,9 +86,9 @@ class Shower < DataHandler
             string_puts.concat("\n|")
             (0..i).each do |k|
               if k == index_string_type
-                string_puts.concat(change_format(k, j)).concat("|")
+                string_puts.concat(change_format(k, j)).concat('|')
               else
-                string_puts.concat(change_format(k, '')).concat("|")
+                string_puts.concat(change_format(k, '')).concat('|')
               end
             end
           end
@@ -103,9 +102,7 @@ class Shower < DataHandler
   def get_index_string_type(length_current_array)
     index_string = -1
     (0..length_current_array).each do |i|
-      if get_hash_index_types[i] == 'string'
-        index_string = i
-      end
+      index_string = i if get_hash_index_types[i] == 'string'
     end
     index_string
   end

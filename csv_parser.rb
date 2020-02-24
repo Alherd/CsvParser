@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'CSV'
 
 class CsvParser
@@ -10,9 +12,9 @@ class CsvParser
 end
 
 class LengthDeterminant < CsvParser
-  def get_hash_index_types
+  def create_hash_index_types
     column_types_array = data_from_csv[0][0].split(';')
-    hash_index_types = Hash.new
+    hash_index_types = {}
     (0..column_types_array.length - 1).each do |i|
       hash_index_types[i] = column_types_array[i]
     end
@@ -20,8 +22,8 @@ class LengthDeterminant < CsvParser
   end
 
   def define_max_length
-    hash_max_length = Hash.new
-    index_types = get_hash_index_types
+    hash_max_length = {}
+    index_types = create_hash_index_types
     (0..index_types.length - 1).each do |i|
       hash_max_length.merge!(i => 0)
     end
@@ -35,8 +37,8 @@ class LengthDeterminant < CsvParser
           string_list.each do |word|
             hash_max_length[j] = word.length if hash_max_length[j] < word.length
           end
-        else
-          hash_max_length[j] = current_row_array[j].length if hash_max_length[j] < current_row_array[j].length
+        elsif hash_max_length[j] < current_row_array[j].length
+          hash_max_length[j] = current_row_array[j].length
         end
       end
     end
@@ -54,22 +56,22 @@ class LinesBuilder < LengthDeterminant
   def count_length_line
     chars_count = 0
     (0..max_length_hash.length - 1).each do |i|
-      chars_count = chars_count + max_length_hash[i]
+      chars_count += max_length_hash[i]
     end
     chars_count
   end
 
-  def get_first_line
+  def create_first_line
     chars_count = count_length_line
-    first_line = '+'
+    first_line = '+'.dup
     (1..(chars_count + max_length_hash.length - 1)).each do
       first_line.concat('-')
     end
     first_line.concat('+')
   end
 
-  def get_last_line
-    last_line = '+'
+  def create_last_line
+    last_line = '+'.dup
     (0..max_length_hash.length - 1).each do |i|
       (1..max_length_hash[i]).each do
         last_line.concat('-')

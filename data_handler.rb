@@ -9,7 +9,7 @@ class DataHandler < LinesBuilder
   MONEY_COLUMN = 'money'
 
   def change_format(index, value)
-    index_types = get_hash_index_types
+    index_types = create_hash_index_types
     case index_types[index]
     when 'int'
       show_string = IntDataHandler.new.add_space(index, value)
@@ -65,44 +65,56 @@ class Shower < DataHandler
   def show
     data_csv_without_types_columns = data_from_csv.drop(1)
     index_string_type = get_index_string_type(data_csv_without_types_columns[0][0].split(';').length)
-    puts get_first_line
+    puts create_first_line
     data_csv_without_types_columns.each do |row|
-      current_row_array = row[0].split(';')
-      string_puts = '|'.dup
-      (0..current_row_array.length - 1).each do |i|
-        if index_string_type != -1
-          if i == index_string_type
-            string_array = current_row_array[i].split(' ')
-            string_puts.concat(change_format(i, string_array[0])).concat('|')
-          else
-            string_puts.concat(change_format(i, current_row_array[i])).concat('|')
-          end
+      handle_row_array(row, index_string_type)
+    end
+  end
+
+  def handle_row_array(row, index_string_type)
+    current_row_array = row[0].split(';')
+    string_puts = '|'.dup
+    (0..current_row_array.length - 1).each do |i|
+      split_current_row(current_row_array, index_string_type, i, string_puts)
+      add_other_strings(index_string_type, current_row_array, i, string_puts)
+    end
+    puts string_puts
+    puts create_last_line
+  end
+
+  def split_current_row(current_row_array, index_string_type, index, string_puts)
+    if index_string_type != -1
+      if index == index_string_type
+        string_array = current_row_array[index].split(' ')
+        string_puts.concat(change_format(index, string_array[0])).concat('|')
+      else
+        string_puts.concat(change_format(index, current_row_array[index])).concat('|')
+      end
+    else
+      string_puts.concat(change_format(index, current_row_array[index])).concat('|')
+    end
+  end
+
+  def add_other_strings(index_string_type, current_row_array, index, string_puts)
+    return unless index_string_type != -1 && index == current_row_array.length - 1
+
+    string_array = current_row_array[index_string_type].split(' ').drop(1)
+    string_array.each do |j|
+      string_puts.concat("\n|")
+      (0..index).each do |k|
+        if k == index_string_type
+          string_puts.concat(change_format(k, j)).concat('|')
         else
-          string_puts.concat(change_format(i, current_row_array[i])).concat('|')
-        end
-        if index_string_type != -1 && i == current_row_array.length - 1
-          string_array = current_row_array[index_string_type].split(' ').drop(1)
-          string_array.each do |j|
-            string_puts.concat("\n|")
-            (0..i).each do |k|
-              if k == index_string_type
-                string_puts.concat(change_format(k, j)).concat('|')
-              else
-                string_puts.concat(change_format(k, '')).concat('|')
-              end
-            end
-          end
+          string_puts.concat(change_format(k, '')).concat('|')
         end
       end
-      puts string_puts
-      puts get_last_line
     end
   end
 
   def get_index_string_type(length_current_array)
     index_string = -1
     (0..length_current_array).each do |i|
-      index_string = i if get_hash_index_types[i] == 'string'
+      index_string = i if create_hash_index_types[i] == 'string'
     end
     index_string
   end

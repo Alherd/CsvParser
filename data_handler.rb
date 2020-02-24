@@ -4,10 +4,6 @@ require './csv_parser.rb'
 
 # Base Data class to delegate adding space realization
 class DataHandler < LinesBuilder
-  INT_COLUMN = 'int'
-  STRING_COLUMN = 'string'
-  MONEY_COLUMN = 'money'
-
   def change_format(index, value) # rubocop:disable Metrics/MethodLength
     index_types = create_hash_index_types
     case index_types[index]
@@ -21,45 +17,36 @@ class DataHandler < LinesBuilder
       ''
     end
   end
-end
 
-class IntDataHandler < DataHandler
-  def add_space(index, value)
+  def create_space(index, value)
     int_max_length = define_max_length[index]
     space = ''.dup
     (value.length..int_max_length - 1).each do
       space.concat(' ')
     end
-    space.concat(value)
+    space
+  end
+end
+
+class IntDataHandler < DataHandler
+  def add_space(index, value)
+    create_space(index, value).concat(value)
   end
 end
 
 class StringDataHandler < DataHandler
   def add_space(index, value)
-    int_max_length = define_max_length[index]
-    space = ''.dup
-    (value.length..int_max_length - 1).each do
-      space.concat(' ')
-    end
-    value.concat(space)
+    value.concat(create_space(index, value))
   end
 end
 
 class MoneyDataHandler < DataHandler
   def add_space(index, value)
-    int_max_length = define_max_length[index]
-    space = ''.dup
-    (value.length..int_max_length - 1).each do
-      space.concat(' ')
-    end
-    space.concat(replace_dot(value))
-  end
-
-  def replace_dot(value)
-    value.gsub('.', ',')
+    create_space(index, value).concat(value.gsub('.', ','))
   end
 end
 
+# Class to show console table output
 class Shower < DataHandler
   def show
     data_csv_without_types_columns = data_from_csv.drop(1)
@@ -85,12 +72,12 @@ class Shower < DataHandler
     if index_string_type != -1
       if index == index_string_type
         string_array = current_row_array[index].split(' ')
-        string_puts.concat(change_format(index, string_array[0])).concat('|')
+        concat_format_string(string_puts, index, string_array[0])
       else
-        string_puts.concat(change_format(index, current_row_array[index])).concat('|')
+        concat_format_string(string_puts, index, current_row_array[index])
       end
     else
-      string_puts.concat(change_format(index, current_row_array[index])).concat('|')
+      concat_format_string(string_puts, index, current_row_array[index])
     end
   end
 
@@ -98,14 +85,22 @@ class Shower < DataHandler
     return unless index_string_type != -1 && index == current_row_array.length - 1
 
     string_array = current_row_array[index_string_type].split(' ').drop(1)
-    string_array.each do |j|
+    string_array.each do |word|
       string_puts.concat("\n|")
-      (0..index).each do |k|
-        if k == index_string_type
-          string_puts.concat(change_format(k, j)).concat('|')
-        else
-          string_puts.concat(change_format(k, '')).concat('|')
-        end
+      handle_show_word(index, word, index_string_type, string_puts)
+    end
+  end
+
+  def concat_format_string(string_puts, index_row_array, value)
+    string_puts.concat(change_format(index_row_array, value)).concat('|')
+  end
+
+  def handle_show_word(index, word, index_string_type, string_puts)
+    (0..index).each do |index_row_array|
+      if index_row_array == index_string_type
+        concat_format_string(string_puts, index_row_array, word)
+      else
+        concat_format_string(string_puts, index_row_array, '')
       end
     end
   end

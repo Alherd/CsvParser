@@ -2,8 +2,13 @@
 
 require 'CSV'
 
+# Base class to parse data to array from csv
 class CsvParser
   CSV_FILE_PATH = './test.csv'
+  INT_COLUMN = 'int'
+  STRING_COLUMN = 'string'
+  MONEY_COLUMN = 'money'
+
   attr_reader :data_from_csv
 
   def initialize
@@ -11,6 +16,7 @@ class CsvParser
   end
 end
 
+# Class to define max length of array values
 class LengthDeterminant < CsvParser
   def create_hash_index_types
     column_types_array = data_from_csv[0][0].split(';')
@@ -42,7 +48,7 @@ class LengthDeterminant < CsvParser
   end
 
   def define_max_string_word(hash_max_length, current_row_array, index_types, index)
-    if index_types[index] == 'string'
+    if index_types[index] == STRING_COLUMN
       string_list = current_row_array[index].split(' ')
       string_list.each do |word|
         hash_max_length[index] = word.length if hash_max_length[index] < word.length
@@ -53,9 +59,8 @@ class LengthDeterminant < CsvParser
   end
 end
 
+# Class to create lines for console output
 class LinesBuilder < LengthDeterminant
-  attr_reader :last_line
-
   def max_length_hash
     define_max_length
   end

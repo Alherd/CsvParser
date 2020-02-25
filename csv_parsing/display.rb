@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require './csv_parsing/data_handler.rb'
+require './csv_parsing/lines_builder.rb'
+require './csv_parsing/length_determinant.rb'
 
 # Class to show console table output
 class Display < DataHandler
@@ -18,7 +20,7 @@ class Display < DataHandler
     string_puts = '|'.dup
     (0..current_row_array.length - 1).each do |i|
       split_current_row(current_row_array, index_string_type, i, string_puts)
-      add_other_strings(index_string_type, current_row_array, i, string_puts)
+      add_remaining_words(index_string_type, current_row_array, i, string_puts)
     end
     puts string_puts
     puts create_last_line
@@ -37,7 +39,7 @@ class Display < DataHandler
     end
   end
 
-  def add_other_strings(index_string_type, current_row_array, index, string_puts)
+  def add_remaining_words(index_string_type, current_row_array, index, string_puts)
     return unless index_string_type != -1 && index == current_row_array.length - 1
 
     string_array = current_row_array[index_string_type].split(' ').drop(1)

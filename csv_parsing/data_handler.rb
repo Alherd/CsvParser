@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require './csv_parsing/csv_parser.rb'
+require './csv_parsing/lines_builder.rb'
+require './csv_parsing/length_determinant.rb'
 
 # Base Data class to delegate adding space realization
 class DataHandler < LinesBuilder
